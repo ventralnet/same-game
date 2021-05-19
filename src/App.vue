@@ -1,12 +1,17 @@
 <template>
   <div id="app">
-    grid
+    <grid></grid>
   </div>
 </template>
 
 <script>
+import Grid from '@/components/Grid.vue';
+
 export default {
   name: 'App',
+  components: {
+    Grid,
+  },
 };
 </script>
 
