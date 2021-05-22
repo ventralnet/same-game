@@ -40,9 +40,9 @@ export default {
   },
   created() {
     const matrix = [];
-    for (let row = 0; row < this.gridWidth; row += 1) {
+    for (let row = 0; row < this.gridHeight; row += 1) {
       matrix[row] = [];
-      for (let col = 0; col < this.gridHeight; col += 1) {
+      for (let col = 0; col < this.gridWidth; col += 1) {
         matrix[row].push({
           color: this.randomColor(),
           isHighlighted: false,
@@ -59,9 +59,31 @@ export default {
         this.handleHighlighting(item, row, col);
       } else {
         this.clearSelection();
+        this.compactGrid();
         // clear squashed items
         // rebuild matrix
         // test is complete
+      }
+    },
+
+    compactGrid() {
+      // Check north south
+
+      // check east west
+      for (let col = this.gridWidth - 1; col >= 0; col -= 1) {
+        for (let row = this.gridHeight - 1; row > 0; row -= 1) {
+          const item = this.gridMatrix[row][col];
+          if (item.color === 'transparent') {
+            for (let i = row - 1; i >= 0; i -= 1) {
+              const above = this.gridMatrix[i][col];
+              if (above.color !== 'transparent') {
+                item.color = above.color;
+                above.color = 'transparent';
+                break;
+              }
+            }
+          }
+        }
       }
     },
 

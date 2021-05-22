@@ -3,7 +3,7 @@
     :class="{ 'is-highlighted': isHighlighted }"
     :style="{ backgroundColor: color }"
     style="width: 85px; height: 85px"
-    class="grid-item"
+    class="grid-item rounded-circle"
   />
 </template>
 
@@ -29,6 +29,6 @@ export default {
 }
 
 .grid-item {
-  transition: background-color 500ms linear;
+  transition: background-color 250ms linear;
 }
 </style>
