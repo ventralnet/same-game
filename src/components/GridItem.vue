@@ -29,6 +29,6 @@ export default {
 }
 
 .grid-item {
-  transition: background-color 250ms linear;
+  // transition: background-color 250ms linear;
 }
 </style>

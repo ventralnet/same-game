@@ -67,9 +67,6 @@ export default {
     },
 
     compactGrid() {
-      // Check north south
-
-      // check east west
       for (let col = this.gridWidth - 1; col >= 0; col -= 1) {
         for (let row = this.gridHeight - 1; row > 0; row -= 1) {
           const item = this.gridMatrix[row][col];
@@ -85,6 +82,24 @@ export default {
           }
         }
       }
+
+      for (let col = 0; col < this.gridWidth; col += 1) {
+        if (this.isEmptyColumn(col)) {
+          for (let rightCol = col + 1; rightCol < this.gridWidth; rightCol += 1) {
+            if (!this.isEmptyColumn(rightCol)) {
+              for (let row = 0; row < this.gridHeight; row += 1) {
+                this.gridMatrix[row][col].color = this.gridMatrix[row][rightCol].color;
+                this.gridMatrix[row][rightCol].color = 'transparent';
+              }
+              break;
+            }
+          }
+        }
+      }
+    },
+
+    isEmptyColumn(colIndex) {
+      return this.gridMatrix.every((row) => row[colIndex].color === 'transparent');
     },
 
     clearSelection() {

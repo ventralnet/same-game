@@ -42,6 +42,12 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
+    "globals": {
+      "describe": true,
+      "beforeEach": true,
+      "it": true,
+      "expect": true
+    }, 
     "rules": {},
     "overrides": [
       {
