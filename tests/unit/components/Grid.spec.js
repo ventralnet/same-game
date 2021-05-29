@@ -3,6 +3,55 @@ import Grid from '@/components/Grid.vue';
 import { shallowMount } from '@vue/test-utils';
 
 describe('Grid.vue', () => {
+  describe('if the game is over', () => {
+    it('game is not over if there are still valid clusters to select', () => {
+      const mockGrid = [
+        [{ color: 'transparent' }, { color: 'red' }, { color: 'orange' }],
+        [{ color: 'orange' }, { color: 'blue' }, { color: 'green' }],
+        [{ color: 'purple' }, { color: 'purple' }, { color: 'purple' }],
+      ];
+
+      const wrapper = shallowMount(Grid, {
+        data() {
+          return {
+            gridMatrix: mockGrid,
+            gridWidth: 3,
+            gridHeight: 3,
+          };
+        },
+      });
+
+      wrapper.setData({ gridMatrix: mockGrid });
+
+      const result = wrapper.vm.isGameOver();
+
+      expect(result).toBeFalsy();
+    });
+
+    it('game IS over if there are no longer valid clusters to select', () => {
+      const mockGrid = [
+        [{ color: 'transparent' }, { color: 'orange' }, { color: 'blue' }],
+        [{ color: 'red' }, { color: 'green' }, { color: 'red' }],
+      ];
+
+      const wrapper = shallowMount(Grid, {
+        data() {
+          return {
+            gridMatrix: mockGrid,
+            gridWidth: 3,
+            gridHeight: 2,
+          };
+        },
+      });
+
+      wrapper.setData({ gridMatrix: mockGrid });
+
+      const result = wrapper.vm.isGameOver();
+
+      expect(result).toBeTruthy();
+    });
+  });
+
   describe('compactingGrid', () => {
     it('compacts vertically', () => {
       const mockGrid = [

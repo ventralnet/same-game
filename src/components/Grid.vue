@@ -1,5 +1,7 @@
 <template>
   <div>
+    {{ scorer.totalScore }}
+    {{ potentialScore }}
     <div
       v-for="(row, rowIndex) in gridMatrix"
       :key="`row${rowIndex}`"
@@ -19,6 +21,7 @@
 
 <script>
 import GridItem from '@/components/GridItem.vue';
+import Scorer from '@/Scorer';
 
 const colorPalette = [
   'red',
@@ -34,6 +37,8 @@ export default {
   data() {
     return {
       gridMatrix: [],
+      scorer: new Scorer(),
+      potentialScore: 0,
       gridWidth: 10,
       gridHeight: 10,
     };
@@ -57,13 +62,48 @@ export default {
       if (!item.isHighlighted) {
         this.resetHighlighted();
         this.handleHighlighting(item, row, col);
+        console.log(this.getSelectedCluster());
+        this.potentialScore = this.scorer.calculatePotentialScore(this.getSelectedCluster().length);
       } else {
+        this.scorer.updateScore(this.potentialScore);
+        this.potentialScore = 0;
         this.clearSelection();
         this.compactGrid();
-        // clear squashed items
-        // rebuild matrix
-        // test is complete
+        if (this.isGameOver()) {
+          alert('game over');
+        }
       }
+    },
+
+    isGameOver() {
+      let validClustersExist = false;
+      for (let col = 0; col < this.gridWidth; col += 1) {
+        for (let row = 0; row < this.gridHeight; row += 1) {
+          const item = this.gridMatrix[row][col];
+          if (item.color !== 'transparent') {
+            const north = row > 0 ? this.gridMatrix[row - 1][col] : undefined;
+            const east = col < this.gridWidth - 1 ? this.gridMatrix[row][col + 1] : undefined;
+            const west = col > 0 ? this.gridMatrix[row][col - 1] : undefined;
+            const south = row < this.gridHeight - 1 ? this.gridMatrix[row + 1][col] : undefined;
+
+            validClustersExist = this.isSameColor(item, north)
+                                 || this.isSameColor(item, south)
+                                 || this.isSameColor(item, east)
+                                 || this.isSameColor(item, west);
+            if (validClustersExist) {
+              break;
+            }
+          }
+        }
+        if (validClustersExist) {
+          break;
+        }
+      }
+      return !validClustersExist;
+    },
+
+    isSameColor(a, b) {
+      return b && b.color === a.color;
     },
 
     compactGrid() {
@@ -112,6 +152,8 @@ export default {
     },
 
     getSelectedCluster() {
+      console.log(`flat = ${this.gridMatrix.flat()}`);
+      console.log(this.gridMatrix.flat().filter((col) => col.isHighlighted));
       return this.gridMatrix.flat().filter((col) => col.isHighlighted);
     },
 
@@ -167,23 +209,21 @@ export default {
         }
       }
 
-      this.$nextTick(() => {
-        if (hasWest) {
-          this.handleHighlighting(item, row, col - 1);
-        }
+      if (hasWest) {
+        this.handleHighlighting(item, row, col - 1);
+      }
 
-        if (hasEast) {
-          this.handleHighlighting(item, row, col + 1);
-        }
+      if (hasEast) {
+        this.handleHighlighting(item, row, col + 1);
+      }
 
-        if (hasSouth) {
-          this.handleHighlighting(item, row + 1, col);
-        }
+      if (hasSouth) {
+        this.handleHighlighting(item, row + 1, col);
+      }
 
-        if (hasNorth) {
-          this.handleHighlighting(item, row - 1, col);
-        }
-      });
+      if (hasNorth) {
+        this.handleHighlighting(item, row - 1, col);
+      }
     },
 
     randomColor() {
