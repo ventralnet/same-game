@@ -2,16 +2,18 @@
   <div>
     {{ scorer.totalScore }}
     {{ potentialScore }}
+    {{ screenWidth }} x {{ screenHeight }}
     <div
       v-for="(row, rowIndex) in gridMatrix"
       :key="`row${rowIndex}`"
-      class="mb-1">
+      class="mb-1 text-center m-auto">
       <div
         v-for="(col, colIndex) in row"
         :key="`col${colIndex}${rowIndex}`"
-        class="d-inline-block mx-1"
+        class="d-inline-block"
         @click="handleClick(rowIndex, colIndex)">
         <grid-item
+          class="grid-item"
           :is-highlighted="col.isHighlighted"
           :color="col.color" />
       </div>
@@ -39,8 +41,12 @@ export default {
       gridMatrix: [],
       scorer: new Scorer(),
       potentialScore: 0,
-      gridWidth: 10,
-      gridHeight: 10,
+      screenWidth: window.screen.width,
+      screenHeight: window.screen.height,
+      itemWidth: 85,
+      itemHeight: 85,
+      gridWidth: 11,
+      gridHeight: 8,
     };
   },
   created() {
@@ -62,12 +68,12 @@ export default {
       if (!item.isHighlighted) {
         this.resetHighlighted();
         this.handleHighlighting(item, row, col);
-        console.log(this.getSelectedCluster());
         this.potentialScore = this.scorer.calculatePotentialScore(this.getSelectedCluster().length);
       } else {
         this.scorer.updateScore(this.potentialScore);
         this.potentialScore = 0;
         this.clearSelection();
+        window.navigator.vibrate(250);
         this.compactGrid();
         if (this.isGameOver()) {
           alert('game over');
@@ -152,8 +158,6 @@ export default {
     },
 
     getSelectedCluster() {
-      console.log(`flat = ${this.gridMatrix.flat()}`);
-      console.log(this.gridMatrix.flat().filter((col) => col.isHighlighted));
       return this.gridMatrix.flat().filter((col) => col.isHighlighted);
     },
 
@@ -173,56 +177,58 @@ export default {
       let hasEast = false;
       let hasWest = false;
 
-      if (row > 0) {
-        const northItem = this.gridMatrix[row - 1][col];
-        if (!northItem.isHighlighted && northItem.color === localItem.color) {
-          hasNorth = true;
-          localItem.isHighlighted = true;
-          northItem.isHighlighted = true;
+      if (localItem.color !== 'transparent') {
+        if (row > 0) {
+          const northItem = this.gridMatrix[row - 1][col];
+          if (!northItem.isHighlighted && northItem.color === localItem.color) {
+            hasNorth = true;
+            localItem.isHighlighted = true;
+            northItem.isHighlighted = true;
+          }
         }
-      }
 
-      if (row < this.gridMatrix.length - 1) {
-        const southItem = this.gridMatrix[row + 1][col];
-        if (!southItem.isHighlighted && southItem.color === localItem.color) {
-          hasSouth = true;
-          localItem.isHighlighted = true;
-          southItem.isHighlighted = true;
+        if (row < this.gridMatrix.length - 1) {
+          const southItem = this.gridMatrix[row + 1][col];
+          if (!southItem.isHighlighted && southItem.color === localItem.color) {
+            hasSouth = true;
+            localItem.isHighlighted = true;
+            southItem.isHighlighted = true;
+          }
         }
-      }
 
-      if (col > 0) {
-        const westItem = this.gridMatrix[row][col - 1];
-        if (!westItem.isHighlighted && westItem.color === localItem.color) {
-          hasWest = true;
-          localItem.isHighlighted = true;
-          westItem.isHighlighted = true;
+        if (col > 0) {
+          const westItem = this.gridMatrix[row][col - 1];
+          if (!westItem.isHighlighted && westItem.color === localItem.color) {
+            hasWest = true;
+            localItem.isHighlighted = true;
+            westItem.isHighlighted = true;
+          }
         }
-      }
 
-      if (col < this.gridMatrix[row].length - 1) {
-        const eastItem = this.gridMatrix[row][col + 1];
-        if (!eastItem.isHighlighted && eastItem.color === localItem.color) {
-          hasEast = true;
-          localItem.isHighlighted = true;
-          eastItem.isHighlighted = true;
+        if (col < this.gridMatrix[row].length - 1) {
+          const eastItem = this.gridMatrix[row][col + 1];
+          if (!eastItem.isHighlighted && eastItem.color === localItem.color) {
+            hasEast = true;
+            localItem.isHighlighted = true;
+            eastItem.isHighlighted = true;
+          }
         }
-      }
 
-      if (hasWest) {
-        this.handleHighlighting(item, row, col - 1);
-      }
+        if (hasWest) {
+          this.handleHighlighting(item, row, col - 1);
+        }
 
-      if (hasEast) {
-        this.handleHighlighting(item, row, col + 1);
-      }
+        if (hasEast) {
+          this.handleHighlighting(item, row, col + 1);
+        }
 
-      if (hasSouth) {
-        this.handleHighlighting(item, row + 1, col);
-      }
+        if (hasSouth) {
+          this.handleHighlighting(item, row + 1, col);
+        }
 
-      if (hasNorth) {
-        this.handleHighlighting(item, row - 1, col);
+        if (hasNorth) {
+          this.handleHighlighting(item, row - 1, col);
+        }
       }
     },
 
@@ -235,6 +241,29 @@ export default {
 };
 </script>
 
-<style lang="text/scss">
+<style>
+.grid-item {
+  width: 75px;
+  height: 75px;
+}
 
+@media (max-width: 1000px) {
+  @media(orientation: landscape) {
+    .grid-item {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .grid {
+    min-width: 350px;
+  }
+
+  @media(orientation: portrait) {
+    .grid-item {
+      width: 32px;
+      height: 32px;
+    }
+  }
+}
 </style>

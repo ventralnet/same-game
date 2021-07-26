@@ -43,6 +43,7 @@
       "parser": "babel-eslint"
     },
     "globals": {
+      "screen": true,
       "describe": true,
       "beforeEach": true,
       "it": true,
